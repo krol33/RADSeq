@@ -8,16 +8,25 @@ maria.bernard@jouy.inra.fr
 
 
 si vous n'avez pas de dépôt git local il vous suffit simplement de créer un répertoire
-mkdir /save/USER/git
-cd /save/USER/git
 
-git clone https://github.com/mariabernard/RADSeq.git
-git clone https://github.com/mariabernard/libR.git
+	mkdir /save/USER/git
+	cd /save/USER/git
+
+	git clone https://github.com/mariabernard/RADSeq.git
+	git clone https://github.com/mariabernard/libR.git
+
+Pour mettre à jour votre dépôt
+	
+	cd /save/USER/git/RADSeq
+	git pull
+	cd /save/USER/git/libR
+	git pull
 
 puis faites en une copie dans votre save au niveau d'un dossier dédié à votre projet. Les scripts sont à modifier, attention de ne pas modifier les versions du dépôt, vous n'avez pas les droits en écriture mais en faisant ça vous perdrez à chaque mise à jour du dépôt ou à chaque projet RADSeq les commandes que vous avez lancé pour un projet en particulier.
-mkdir /save/USER/MON_PROJET_RAD
-cd /save/USER/MON_PROJET_RAD
-cp /save/USER/SVN_forge_DGA/RADSeq/* .
+
+	mkdir /save/USER/MON_PROJET_RAD
+	cd /save/USER/MON_PROJET_RAD
+	cp /save/USER/SVN_forge_DGA/RADSeq/* .
 
 Stacks version : 1.35		
 
@@ -125,10 +134,9 @@ Cette étape correspond à la clusterisation des lectures de chaque individus et
 		- MAX_SEC_DIST=4 : le nombre de mismatch autorisés pour agréger des "secondary reads", augmenter la couverture des locus (-N par défaut = -M+2 dans stacks)
 		- STACKS_OPT="" (optionnel): si vous souhaitez ajouter d'autres option ustacks (sachant qu'il y a déjà -r et -d ). Gardez les "" .
 		
-Différence entre happloïde doublé ou non:
-		- le nombre maximal de stacks par cluster, autrement dit le nombre d'allèles possibles par locus (--max_locus_stacks) : 
-			- pour les individus happloïdes doublés tous les locus sont attendus sans SNP donc avec un allèle + une marge d'erreur --max_locus_stacks = 2, 
-			- suivant la même théorie pour un individus hétérozygote 2 allèles + erreur = --max_locus_stacks = 3 . Cette option est indiquée en dure dans les commande ustacks
+Différence entre happloïde doublé ou non: le nombre maximal de stacks par cluster, autrement dit le nombre d'allèles possibles par locus (--max_locus_stacks) : 
+- pour les individus happloïdes doublés tous les locus sont attendus sans SNP donc avec un allèle + une marge d'erreur --max_locus_stacks = 2, 
+- suivant la même théorie pour un individus hétérozygote 2 allèles + erreur = --max_locus_stacks = 3 . Cette option est indiquée en dure dans les commande ustacks
 			
 Les individus happloïdes doublés permettent de contrôler la clusterisation. Dans tous les cas on attend plus de site homozygote qu'hétérozygote, et dans le cas des happloïdes doublés la différence de proportions doivent être encore plus marquée.
 
