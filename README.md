@@ -7,18 +7,19 @@ auteur : Maria Bernard
 maria.bernard@jouy.inra.fr
 
 
-si vous n'avez pas de SVN local il vous suffit simplement de créer un répertoire
+si vous n'avez pas de dépôt git local il vous suffit simplement de créer un répertoire
 mkdir /save/USER/git
 cd /save/USER/git
 
 git clone https://github.com/mariabernard/RADSeq.git
+git clone https://github.com/mariabernard/libR.git
 
 puis faites en une copie dans votre save au niveau d'un dossier dédié à votre projet. Les scripts sont à modifier, attention de ne pas modifier les versions du dépôt, vous n'avez pas les droits en écriture mais en faisant ça vous perdrez à chaque mise à jour du dépôt ou à chaque projet RADSeq les commandes que vous avez lancé pour un projet en particulier.
 mkdir /save/USER/MON_PROJET_RAD
 cd /save/USER/MON_PROJET_RAD
 cp /save/USER/SVN_forge_DGA/RADSeq/* .
 
-				
+Stacks version : 1.35		
 
 ## 				1) LES DONNEES D'ENTREE
 
@@ -34,8 +35,8 @@ Ce fichier est un fichier tabulé qui décrit les individus en 4 colonnes:
 
 - L'INDEX [OBLIGATOIRE] servira dans tous les fichiers de résultats de Stacks à identifier vos individus (généralement la deuxième colonne des fichiers).
 - NAME [OBLIGATOIRE] est le nom des individus qui ont été séquencé, seul condition tous les noms doivent être unique. S'il y a des réplicats, ils doivent être identifiés différement d'une manière ou d'une autre. Biensûre pas de caractère spéciaux ou d'espacement dans les noms (ceci est valable tout le temps pour n'importe quel nom de variable ou de fichier)
-	- RUN_NAME [OBLIGATOIRE] est le nom du run dans lequel l'échantillon a été séquencé. Ce nom est l'équivalent du préfix des fichiers fastq stockés dans le dossier data. Le premier script qui permet de faire le démultiplexage ira chercher automatique dans le dossier data les fichiers qui commencent par le nom du run fourni dans indiv_barcode.txt et suivi de "_1.fq.gz" et "_2.fq.gz" . Le RUN_NAME servira également à construire l'arborescence des dossiers ensuite
-	- BARCODE_SEQUENCE [OPTIONNEL] est la séquence qui permet d'identifier l'individus dans le run. Si vos données sont démultiplexées alors vous n'avez pas besoins de fournir cette information et vous pouvez vous reporter à l'arborescence de fichier indiqué en 1)b)1).
+- RUN_NAME [OBLIGATOIRE] est le nom du run dans lequel l'échantillon a été séquencé. Ce nom est l'équivalent du préfix des fichiers fastq stockés dans le dossier data. Le premier script qui permet de faire le démultiplexage ira chercher automatique dans le dossier data les fichiers qui commencent par le nom du run fourni dans indiv_barcode.txt et suivi de "_1.fq.gz" et "_2.fq.gz" . Le RUN_NAME servira également à construire l'arborescence des dossiers ensuite
+- BARCODE_SEQUENCE [OPTIONNEL] est la séquence qui permet d'identifier l'individus dans le run. Si vos données sont démultiplexées alors vous n'avez pas besoins de fournir cette information et vous pouvez vous reporter à l'arborescence de fichier indiqué en 1)b)1).
 
 
 ### b) population.map
@@ -113,7 +114,7 @@ Vous trouverez quelques statistiques bilan du preprocessing dans le fichier SGE_
 ### c) stacks_step1.sh: clustering individuel des lectures
 
 Cette étape correspond à la clusterisation des lectures de chaque individus et à la détection des SNPs pour chaque individus.
-	Les programmes ustacks ou pstacks est le coeur de cette étape.
+	Les programmes ustacks (http://creskolab.uoregon.edu/stacks/comp/ustacks.php )ou pstacks (http://creskolab.uoregon.edu/stacks/comp/pstacks.php) est le coeur de cette étape.
 	
 	OPTIONS:
 		- GENOME="" : chemin vers le génome de référence au format fasta. Celui ci doit déjà être indexé pour BWA. Si vous souhaitez travailler en de novo, laisser vide.
@@ -125,7 +126,9 @@ Cette étape correspond à la clusterisation des lectures de chaque individus et
 		- STACKS_OPT="" (optionnel): si vous souhaitez ajouter d'autres option ustacks (sachant qu'il y a déjà -r et -d ). Gardez les "" .
 		
 Différence entre happloïde doublé ou non:
-		- le nombre maximal de stacks par cluster, autrement dit le nombre d'allèles possibles par locus (--max_locus_stacks) : pour les individus happloïdes doublés tous les locus sont attendus sans SNP donc avec un allèle + une marge d'erreur --max_locus_stacks = 2, suivant la même théorie pour un individus hétérozygote 2 allèles + erreur = --max_locus_stacks = 3 . Cette option est indiquée en dure dans les commande ustacks
+		- le nombre maximal de stacks par cluster, autrement dit le nombre d'allèles possibles par locus (--max_locus_stacks) : 
+			- pour les individus happloïdes doublés tous les locus sont attendus sans SNP donc avec un allèle + une marge d'erreur --max_locus_stacks = 2, 
+			- suivant la même théorie pour un individus hétérozygote 2 allèles + erreur = --max_locus_stacks = 3 . Cette option est indiquée en dure dans les commande ustacks
 			
 Les individus happloïdes doublés permettent de contrôler la clusterisation. Dans tous les cas on attend plus de site homozygote qu'hétérozygote, et dans le cas des happloïdes doublés la différence de proportions doivent être encore plus marquée.
 
