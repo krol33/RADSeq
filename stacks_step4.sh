@@ -74,8 +74,8 @@ awk -v D=$OUT_DIR -v RM=$SSTACKS_DIR/indiv_to_be_removed.txt 'BEGIN{while(getlin
 mv $OUT_DIR/tmp.map $OUT_DIR/pop_extract.map
 POP_FILE=$OUT_DIR/pop_extract.map
 
-echo qsub -N ${Proj_Name}_$ANALYSIS_TYPE -o $SGE/$ANALYSIS_TYPE.out -e $SGE/$ANALYSIS_TYPE.err -l h_vmem=32G -l mem=16G -pe parallel_smp 4 $SCRIPT_DIR/$ANALYSIS_TYPE.sh $OUT_DIR $stacks_dir $POP_FILE $SCRIPT_DIR $libR $STAT_DIR \"$OPT\"
-id=`qsub -b y -terse -N ${Proj_Name}_$ANALYSIS_TYPE -o $SGE/$ANALYSIS_TYPE.out -e $SGE/$ANALYSIS_TYPE.err -l h_vmem=32G -l mem=16G -pe parallel_smp 4 $SCRIPT_DIR/$ANALYSIS_TYPE.sh $OUT_DIR $stacks_dir $POP_FILE $SCRIPT_DIR $libR $STAT_DIR \"$OPT\"| awk -F "." '{print $1}'`
+echo qsub -N ${Proj_Name}_$ANALYSIS_TYPE -o $SGE/$ANALYSIS_TYPE.out -e $SGE/$ANALYSIS_TYPE.err -l h_vmem=32G -l mem=16G -pe parallel_smp 10 $SCRIPT_DIR/$ANALYSIS_TYPE.sh $OUT_DIR $stacks_dir $POP_FILE $SCRIPT_DIR $libR $STAT_DIR \"$OPT\"
+id=`qsub -b y -terse -N ${Proj_Name}_$ANALYSIS_TYPE -o $SGE/$ANALYSIS_TYPE.out -e $SGE/$ANALYSIS_TYPE.err -l h_vmem=32G -l mem=16G -pe parallel_smp 10 $SCRIPT_DIR/$ANALYSIS_TYPE.sh $OUT_DIR $stacks_dir $POP_FILE $SCRIPT_DIR $libR $STAT_DIR \"$OPT\"| awk -F "." '{print $1}'`
 
 r=0;
 while [ $r == 0 ] ; do qstat -j $id >& /dev/null ; r=$? ; sleep 10s ; done 

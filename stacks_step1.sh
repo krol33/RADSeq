@@ -33,13 +33,7 @@ POP=`cut -f 2 $POP_FILE | sort -u`
 GENOME=""
 
 # output
-if [[ $GENOME != "" ]]
-then
-	OUT_DIR=$RAD_DIR/pstacks
-else
-	OUT_DIR=$RAD_DIR/ustacks
-fi
-
+OUT_DIR=$RAD_DIR/stacks1
 SGE=$RAD_DIR/SGE_out/`basename $OUT_DIR`
 STAT_DIR=$RAD_DIR/stat/`basename $OUT_DIR`
 
