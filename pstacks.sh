@@ -78,7 +78,7 @@ fi
 # alignement potentiel rem2
 if [[ -e $rem2 ]]
 then
-" Cmd line: \t bwa mem $genomeIndex $rem2 > $out/${indiv}_rem2.sam" 
+echo " Cmd line: \t bwa mem $genomeIndex $rem2 > $out/${indiv}_rem2.sam" 
 bwa mem $genomeIndex $rem2 > $out/${indiv}_rem2.sam
 samtools view -Sh $out/${indiv}_rem2.sam -bo $out/${indiv}_rem2.bam
 merged=$merged" $out/${indiv}_rem2.bam"
