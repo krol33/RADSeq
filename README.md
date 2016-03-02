@@ -67,14 +67,50 @@ Ce fichier est également un fichier tabulé à 2 colonnes:
 Ce fichier sert à différentes étapes. Il est nativement nécessaire pour les analyses de population mais je l'utilise également pour identifier une population controle qui permet de filtrer les génotypes, et/ou pour faire des paramètrages spécifiques en fonction de groupe d'individus (haploïde doublé ou non). Ces étapes de filtres et de paramètrage doivent être adaptées à votre projet. Il permet également d'ordonner les individus dans le tableau final de génotypage. En effet, on décrit souvent indiv_barcode.txt en fonction des run, alors que population map est plutôt écrit en fonction des populations/générations, et donc c'est un ordre plus logique dans le tableau final. 
 
 ## Structure du répertoire de travail
-Créez un dossier data (pour les données brutes) et un dossier SGE_out (pour les log)
+Créez un dossier SGE_out (pour les logs d'éxécution sur le cluster de calcul)
+
+### données non démultipléxées
+Créez un dossier data (pour les données brutes)
 	
-Nommé par défaut data (l'important est que ce soit cohérent avec ce qui est indiqué dans le script), contient simplement les fichiers fastq pairés compressés du séquençage.
+Nommé par défaut data (l'important est que ce soit cohérent avec ce qui est indiqué dans le script), ce dossier contient simplement les fichiers fastq pairés compressés du séquençage.
 Le nom de fichier est parfois long, et la nomenclature de ce nom dépend des plateforme de séquençage. Je vous conseilles donc de faire des liens des fichiers brutes vers le dossier data et de renommer les liens pour avoir quelque chose de plus manipulable. 
 
 !!! Attention toujours en respectant RUN_NAME_1.fq.gz et RUN_NAME_2.fq.gz !!!
 
 Le nom des runs doit correspondre à ce que vous avez indiqué dans indiv_barcode.txt
+
+exemple
+	
+	/work/USER/Mon_projet/
+					|-- data/
+						  |-- EFFICACE_Run1_1.fq.gz
+						  |-- EFFICACE_Run1_2.fq.gz
+						  |-- EFFICACE_Run2_1.fq.gz
+						  |-- EFFICACE_Run2_2.fq.gz
+					|-- SGE_out/
+					indiv_barcode.txt
+					populations.map
+
+
+### données démultipléxées
+
+Créez un dossier preprocess (nom du dossier de sortie du script stacks_step0.sh) et dans ce dossier un dossier par run (en respectant les RUN_NAME sur fichier indiv_barcode.txt). Dans chacun des dossiers RUN_NAME placez les fichiers fastq de vos échantillon, en respectant la nommenclature : NAME_1.fq.gz et NAME_1.fq.gz où NAME sont les noms des individus indiqués dans indiv_barcode.txt. 
+
+exemple
+	
+	/work/USER/Mon_projet/
+					|-- SGE_out/
+					|-- preprocess/
+							 |-- EFFICACE_Run1
+							 			|-- EFFICACE_113_1.fq.gz
+							 			|-- EFFICACE_113_2.fq.gz
+							 			|-- EFFICACE_43_1.fq.gz
+							 			|-- EFFICACE_43_2.fq.gz
+							 |-- EFFICACE_Run2
+							 			|-- EFFICACE_209_1.fq.gz
+							 			|-- EFFICACE_209_2.fq.gz
+					indiv_barcode.txt
+					populations.map
 
 
 ## 				2) ADAPTATION DES SCRIPTS
@@ -115,6 +151,7 @@ Une fois le script adapté avec les généralités, vous pouvez modifier les var
 Vous n'avez plus qu'à lancer le script avec la commande suivante:
 	qsub [Sript_path_dir]/stacks_step0.sh
 
+#### cas des données déjà démultipléxées
 Si vos données sont déjà démultipléxées, faite des liens de vos fichier fq ou fq.gz en respectant l'arborescence qui aurait résulté du démultiplexage autrement dit:
 
 		dans le dossier preprocessing:
