@@ -6,7 +6,6 @@ updated : 01/03/2016
 auteur : Maria Bernard
 maria.bernard@jouy.inra.fr
 
-
 si vous n'avez pas de dépôt git local il vous suffit simplement de créer un répertoire
 
 	mkdir /save/USER/git
@@ -28,7 +27,12 @@ puis faites en une copie dans votre save au niveau d'un dossier dédié à votre
 	cd /save/USER/MON_PROJET_RAD
 	cp /save/USER/SVN_forge_DGA/RADSeq/* .
 
-Stacks version : 1.35		
+DEPENDANCE:
+	script adapté au cluster de calcul Genotoul (http://bioinfo.genotoul.fr/)
+	Stacks (version 1.35 )
+	cap3 (12/21/07)
+	BWA mem (0.7.12)
+	GATK (version 2.4.9)
 
 ## 				1) LES DONNEES D'ENTREE
 
@@ -130,8 +134,10 @@ Cette étape correspond à la clusterisation des lectures de chaque individus et
 		- POP_HD="" : les identifiants de population des happloïdes doublés (s'il y en a), séparés par un espace. Ces identifiants sont ceux du fichier population.map
 		- DD_RAD = 0 ou 1 pour indiquer si vos données sont digérées 1 ou deux fois 
 		- MIN_DEPTH=3 : la couverture minimale d'un stacks autrement dit d'un allèle (-m dans ustacks) ou d'un locus (-m dans pstacks)
+		Pour ustacks seulement
 		- MAX_PRIM_DIST=2 : le nombre de mismatch autorisés entre stacks, autrement dit le nombre potentiel de SNP sur un locus (-M dans ustacks)
-		- MAX_SEC_DIST=4 : le nombre de mismatch autorisés pour agréger des "secondary reads", augmenter la couverture des locus (-N par défaut = -M+2 dans stacks)
+		- MAX_SEC_DIST=4 : le nombre de mismatch autorisés pour agréger des "secondary reads", augmenter la couverture des locus (-N par défaut = -M+2 dans ustacks)
+		- MAX_LOCUS_STACKS : le nombre maximum de stacks (paquet de lectures identiques) à fusionner en un locus, autrement dit le nombre maximum d'allele (--max_locus-stacks dans ustacks)
 		- STACKS_OPT="" (optionnel): si vous souhaitez ajouter d'autres option ustacks (sachant qu'il y a déjà -r et -d ). Gardez les "" .
 		
 Différence entre happloïde doublé ou non: le nombre maximal de stacks par cluster, autrement dit le nombre d'allèles possibles par locus (--max_locus_stacks) : 

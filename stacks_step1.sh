@@ -54,6 +54,8 @@ STACKS_OPT=""
 # SI USTACKS
 MAX_PRIM_DIST=2
 MAX_SEC_DIST=4
+# --max_locus_stacks option pour individus diploïde. (Pour les individus happloïdes doublés cette option sera à 2)
+MAC_LOCUS_STACKS=3
 
 
 ## TODO
@@ -78,35 +80,38 @@ run=`echo $line | awk '{print $3}'`
 # PSTACKS
 if [[ $GENOME != "" ]]
 then
-cmd_line="$SCRIPT_DIR/pstacks.sh --genomeIndex=$GENOME --read1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*1.fq.gz | grep -v "rem" `
-
-rem1=""
-if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.1.fq.gz" ` ]]
-then cmd_line=$cmd_line" --rem1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.1.fq.gz`
-fi
-read2=""
-if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" ` ]]
-then cmd_line=$cmd_line" --read2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" `
-fi
-rem2=""
-if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.2.fq.gz"` ]]
-then cmd_line=$cmd_line" --rem2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.2.fq.gz`
-fi
-if [[ $DDRAD == 1 ]]
-then  cmd_line=$cmd_line" --ddrad"
-fi
-
-echo $cmd_line" --id=$id --indiv=$indiv --out=$OUT_DIR --bin_dir=$stacks_dir --cov=$MIN_DEPTH --opt=\"$STACKS_OPT\"" >> $SGE/stacks1.array
+	cmd_line="$SCRIPT_DIR/pstacks.sh --genomeIndex=$GENOME --read1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*1.fq.gz | grep -v "rem" `
+	
+	rem1=""
+	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.1.fq.gz" ` ]]
+		then cmd_line=$cmd_line" --rem1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.1.fq.gz`
+	fi
+	
+	read2=""
+	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" ` ]]
+		then cmd_line=$cmd_line" --read2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" `
+	fi
+	
+	rem2=""
+	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.2.fq.gz"` ]]
+		then cmd_line=$cmd_line" --rem2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.2.fq.gz`
+	fi
+	
+	if [[ $DDRAD == 1 ]]
+		then  cmd_line=$cmd_line" --ddrad"
+	fi
+	
+	echo $cmd_line" --id=$id --indiv=$indiv --out=$OUT_DIR --bin_dir=$stacks_dir --cov=$MIN_DEPTH --opt=\"$STACKS_OPT\"" >> $SGE/stacks1.array
 #USTACKS
 else
-# configuration pour les individus happloïdes doublés ==> identifié par NUM_POP
-is_HD=`awk -v I=$indiv -v P="$POP_HD" '{if($1==I && match(P,$2)){print "hd"}}' $POP_FILE`
-if [[ "$is_HD" == "hd" ]]
-then
-	echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST 2 \"$STACKS_OPT\"" >> $SGE/stacks1.array
-else
-	echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST 3 \"$STACKS_OPT\"" >> $SGE/stacks1.array
-fi
+	# configuration pour les individus happloïdes doublés ==> identifié par NUM_POP
+	is_HD=`awk -v I=$indiv -v P="$POP_HD" '{if($1==I && match(P,$2)){print "hd"}}' $POP_FILE`
+	if [[ "$is_HD" == "hd" ]]
+	then
+		echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST 2 \"$STACKS_OPT\"" >> $SGE/stacks1.array
+	else
+		echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST $MAC_LOCUS_STACKS \"$STACKS_OPT\"" >> $SGE/stacks1.array
+	fi
 fi
 done
  
