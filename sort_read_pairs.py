@@ -33,14 +33,6 @@ from sort_read_pairs_utils import *
 
 ##################################################################################################################################################
 #
-# CLASS
-#
-##################################################################################################################################################
-
-
-
-##################################################################################################################################################
-#
 # FUNCTIONS
 #
 ##################################################################################################################################################
@@ -230,14 +222,9 @@ def parse_readFile(sample_name, read_file, num_read, reads_dict , tmp_files, arg
     @param tmp_files : [TmpFiles] to manage temporary files
     @param args : [Namespace] Global parameters.
     """
-#     print read_file
-#     first=True
     FH_seq = SequenceFileReader.factory( read_file )
     cat_locus_dict=dict()
     for record in FH_seq:
-#         if first:
-#             print record.id, reads_dict.keys()[0]
-#             first=False
         if len(record.id.split("_")) == 5 and re.search("_(1|2)$",record.id) :
                 record.id = record.id[:-2]
         if record.id in reads_dict:
@@ -250,7 +237,7 @@ def parse_readFile(sample_name, read_file, num_read, reads_dict , tmp_files, arg
             else:
                 cat_locus_dict[cat_locus]=[record]
             #
-            #    Ecriture des record si 200 lectures déjà stockées pour le locus en cours
+            #    Write records if 200 reads already stored for the current locus
             #
             if len(cat_locus_dict[cat_locus]) > 200:
                 if not os.path.join(args.outdir,tmp_files.prefix+"_"+cat_locus+"_"+sample_name+"_"+num_read+"."+args.read_out_format) in tmp_files.files:
@@ -264,7 +251,7 @@ def parse_readFile(sample_name, read_file, num_read, reads_dict , tmp_files, arg
                 FH_out_seq.close()
                 cat_locus_dict[cat_locus] = []
     #
-    #    Ecriture des record restant encore dans cat_locus_dict
+    #    Write remainning records
     #
     for cat_locus in cat_locus_dict:
         if not os.path.join(args.outdir,tmp_files.prefix+"_"+cat_locus+"_"+sample_name+"_"+num_read+"."+args.read_out_format) in tmp_files.files:
@@ -336,12 +323,12 @@ def parse_sample(sample_name, read1_file, read2_file, tags_file, matches_file, l
         Logger.static_write(log_file,str(len(reads_dict))+" reads stored\n")
         
         # parse read1 file and split reads into locus files
-        # store record list into cat_locus_dict, when len record > 200 > write into file
+        #�store record list into cat_locus_dict, when len record > 200 > write into file
         Logger.static_write(log_file,"\tparsing sample read 1 file ... \n")
         parse_readFile(sample_name, read1_file, "1", reads_dict , tmp_files, args)
     
         # parse read2 file if not None and split reads into locus files
-        # store record list into cat_locus_dict, when len record > 200 > write into file
+        #�store record list into cat_locus_dict, when len record > 200 > write into file
         if not read2_file is None:
             Logger.static_write(log_file,"\tparsing sample read 2 file ... \n")
             parse_readFile(sample_name, read2_file, "2", reads_dict , tmp_files, args)
