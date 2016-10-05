@@ -6,6 +6,7 @@ read2=$3
 id=$4
 
 gz=`echo $read1 | awk '{if(match($1,".gz") > 0 ){print "gzfastq"}else{print "fastq"}}'`
+
 if [[ $gz = "gzfastq" ]]
 then
 zcat $read1 | awk 'BEGIN{c=1}{if(c==1){print $0".1";c++}else{if(c<4){c++}else{if(c==4){c=1}} print $0 }}' > $dir/$id.fq
@@ -14,6 +15,7 @@ else
 cat $read1 | awk 'BEGIN{c=1}{if(c==1){print $0".1";c++}else{if(c<4){c++}else{if(c==4){c=1}} print $0 }}' > $dir/$id.fq
 cat $read2 | awk 'BEGIN{c=1}{if(c==1){print $0".2";c++}else{if(c<4){c++}else{if(c==4){c=1}} print $0 }}' >> $dir/$id.fq
 fi
+
 /home/sigenae/bin/fastq2fastaqual.py  $dir/$id.fq
 formcon $dir/$id.fq.fasta 0 600
 cap3 $dir/$id.fq.fasta > $dir/$id.cap3.out
