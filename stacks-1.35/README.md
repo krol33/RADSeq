@@ -132,7 +132,7 @@ exemple
 		- stacks_step5.sh (optionnelle) : filtre des génotypes et tableaux de statistiques allèliques/genotypiques
 		- stacks_step6.sh (optionnelle) : assemblage des mini contig
 
-### A) généralité valables pour tous les scripts
+### A) généralités valables pour tous les scripts
 Certaines modifications sont communes à tous les scripts.:
 
 		- rechercher remplacer "[Project_path_dir]" par le chemin absolu qui mène à votre répertoire de travail sur votre work dédié au projet
