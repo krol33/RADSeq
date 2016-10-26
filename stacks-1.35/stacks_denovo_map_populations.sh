@@ -3,6 +3,7 @@
 #$ -o [Project_path_dir]/SGE_out/stacks_denovo_map.out
 #$ -e [Project_path_dir]/SGE_out/stacks_denovo_map.err
 #$ -N [Proj_Name]_stacks_denovo_map
+#$ -pe parallel_smp 10
 #$ -S /bin/sh
 
 #$ -q unlimitq
@@ -25,6 +26,22 @@ IN_DIR=$RAD_DIR/preprocessing/stacks_input
 OUT_DIR=$RAD_DIR/denovo_map_populations
 SGE=$RAD_DIR/SGE_out/denovo_map_populations
 STAT_DIR=$RAD_DIR/stat/denovo_map_populations
+
+# OPTIONS
+# ustacks
+# attention 
+# si ustacks alors min coverage per stacks ~= allele
+# si ustacks alors min coverage per location ~= locus!
+MIN_DEPTH=3
+MAX_PRIM_DIST=2
+MAX_SEC_DIST=4
+# --max_locus_stacks option pour individus diploïde. (Pour les individus happloïdes doublés cette option sera à 2)
+MAC_LOCUS_STACKS=3
+# autres options telles que :  --model_type --alpha --bound_low --bound_high --bc_err_freq. Ecrire la chaine de caractère entre "quotte"
+STACKS_OPT=""
+
+#cstacks
+MISMATCH=1
 
 ################### checks ##################################
 mkdir -p $OUT_DIR $STAT_DIR $SGE
@@ -49,7 +66,12 @@ fi
 sample=`awk -v I=$IN_DIR '{s=s"-s "I"/"$2".fq.gz "}END{print s}' $INDIV_FILE`
 
 # -t = -d -r dans ustacks
-echo perl /usr/local/bioinfo/src/Stacks/stacks-1.35/scripts/denovo_map.pl $sample -o $OUT_DIR -t -m 3 -M 2 -N 4 -n 1 -T 10 -O $POP_FILE -b 1 -i 1 -e $stacks_dir -S -X \"ustacks:--max_locus_stacks 3\"  > $SGE/denovo_map.sh
+cmd_line="perl /usr/local/bioinfo/src/Stacks/stacks-1.35/scripts/denovo_map.pl $sample -o $OUT_DIR -t -m $MIN_DEPTH -M $MAX_PRIM_DIST -N $MAX_SEC_DIST -n 1 -T 10 -O $POP_FILE -b 1 -i 1 -e $stacks_dir -S "
+if [[ $MAC_LOCUS_STACKS != "" ]]
+then
+  cmd_line=$cmd_line" -X \"ustacks:--max_locus_stacks 3\""
+fi
+echo $cmd_line  > $SGE/denovo_map.sh
 
 echo "DENOVO_MAP"
 
