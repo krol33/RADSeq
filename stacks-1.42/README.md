@@ -30,7 +30,7 @@ puis faites en une copie dans votre save au niveau d'un dossier dédié à votre
 DEPENDANCES:
 	
 	script adapté au cluster de calcul Genotoul (http://bioinfo.genotoul.fr/)
-	Stacks (version 1.35 )
+	Stacks (version 1.42 )
 	cap3 (12/21/07)
 	BWA mem (0.7.12)
 	GATK (version 2.4.9)
