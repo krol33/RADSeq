@@ -3,7 +3,7 @@
 #$ -o [Project_path_dir]/SGE_out/stacks_denovo_map.out
 #$ -e [Project_path_dir]/SGE_out/stacks_denovo_map.err
 #$ -N [Proj_Name]_stacks_denovo_map
-#$ -pe parallel_smp 10
+
 #$ -S /bin/sh
 
 #$ -q unlimitq
@@ -91,8 +91,8 @@ datamash transpose < $OUT_DIR/tmp_poly_cov_transposed > $OUT_DIR/locus_polymorph
 rm $OUT_DIR/tmp_poly_cov_transposed
 
 # génération des fichiers de comptage allèlique/genotypes
-python $script_dir/genetics_stat.py -d -g -i $OUT_DIR/locus_polymorphes_cov.txt -p $POP_FILE -o $OUT_DIR -n all_locus_polymorphes
+python $SCRIPT_DIR/genetics_stat.py -d -g -i $OUT_DIR/locus_polymorphes_cov.txt -p $POP_FILE -o $OUT_DIR -n all_locus_polymorphes
 
 echo "###################"
 echo "Stacks summary"
-python /save/mbernard/script/git/galaxy_wrappers/stacks_summary.py --res-dir $OUT_DIR --logfile $OUT_DIR/denovo_map.log --pop-map $POP_FILE --summary $STAT_DIR/summary.html --stacks-prog denovo_map.pl
+python $SCRIPT_DIR/stacks_summary.py --res-dir $OUT_DIR --logfile $OUT_DIR/denovo_map.log --pop-map $POP_FILE --summary $STAT_DIR/summary.html --stacks-prog denovo_map.pl
