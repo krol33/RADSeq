@@ -10,7 +10,7 @@
 #$ -m bea
 
 # WARNING
-# dans le fichier data les lectures doivent être stockées dans du _1.fq.gz et _2.fq.gz
+# dans le fichier data les lectures doivent être stockées dans du _1.fq.gz et _2.fq.gz ou _1.fastq.gz et _2.fastq.gz
 
 
 date
@@ -26,6 +26,7 @@ SCRIPT_DIR=[Script_path_dir]
 DATA_DIR=$RAD_DIR/data
 INDIV_FILE=$RAD_DIR/indiv_barcode.txt
 POP_FILE=$RAD_DIR/population.map
+dos2unix $POP_FILE
 
 # output
 OUT_DIR=$RAD_DIR/preprocessing
@@ -40,7 +41,7 @@ STAT_DIR=$RAD_DIR/stat/`basename $OUT_DIR`
 #      'mluCI', 'mseI', 'mspI', 'ndeI', 'nheI', 'nlaIII', 'notI', 'nsiI', 
 #      'pstI', 'rsaI', 'sacI', 'sau3AI', 'sbfI', 'sexAI', 'sgrAI', 'speI', 
 #      'sphI', 'taqI', 'xbaI', or 'xhoI'
-Enzyme="sbfI"
+Enzyme=""
 
 #voulez vous travaillez sur des données alignées ou non. oui : align=1, non : align=0
 align=0
@@ -49,14 +50,14 @@ align=0
 paired=1
 
 # voulez vous supprimer les duplicats PCR oui : dereplication=1, non : dereplication=0. 
-# !! attention vallable unique sur single digest pair end!!
+# !! attention vallable uniquement sur single digest pair end!!
 dereplication=0
 
 # nombre de mismatch autorisé sur les barcodes BMM sur le tag de restriction qui suit TMM
 BMM=0
 # si le barcode n'est présent que sur la lecture 1 alors TRIM=1 sinon TRIM=2
 TRIM=1
-# Si vous avez des taille de barcodes différentes, alors après trimming de barcodes vos lectures seront de taille différente. Il est nécessaire pour la suite d'avoir des lectures de même taille. Indiquez ici la taille maximum que vous souhaitez conserver.
+# Si vous avez des taille de barcodes différentes ou si vous avez du ddrad avec un barcode sur une seule extrémité, alors après trimming de barcodes vos lectures seront de taille différente.  Il est nécessaire pour la suite d'avoir des lectures de même taille. Indiquez ici la taille maximum que vous souhaitez conserver.
 LEN=
 
 ################### CHECKS ##################################
