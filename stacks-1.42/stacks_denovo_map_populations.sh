@@ -3,7 +3,7 @@
 #$ -o [Project_path_dir]/SGE_out/stacks_denovo_map.out
 #$ -e [Project_path_dir]/SGE_out/stacks_denovo_map.err
 #$ -N [Proj_Name]_stacks_denovo_map
-#$ -pe parallel_smp 10
+
 #$ -S /bin/sh
 
 #$ -q unlimitq
@@ -15,7 +15,7 @@ date >&2
 Proj_Name=[Proj_Name]
 
 # VARIABLES GENERALES
-stacks_dir=/usr/local/bioinfo/src/Stacks/stacks-1.35/bin
+stacks_dir=/usr/local/bioinfo/src/Stacks/stacks-1.42/bin
 RAD_DIR=[Project_path_dir]
 SCRIPT_DIR=[Script_path_dir]
 
@@ -91,7 +91,7 @@ datamash transpose < $OUT_DIR/tmp_poly_cov_transposed > $OUT_DIR/locus_polymorph
 rm $OUT_DIR/tmp_poly_cov_transposed
 
 # génération des fichiers de comptage allèlique/genotypes
-python $script_dir/genetics_stat.py -d -g -i $OUT_DIR/locus_polymorphes_cov.txt -p $POP_FILE -o $OUT_DIR -n all_locus_polymorphes
+python $SCRIPT_DIR/genetics_stat.py -d -g -i $OUT_DIR/locus_polymorphes_cov.txt -p $POP_FILE -o $OUT_DIR -n all_locus_polymorphes
 
 echo "###################"
 echo "Stacks summary"
