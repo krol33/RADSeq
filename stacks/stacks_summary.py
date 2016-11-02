@@ -31,15 +31,6 @@ import json
 import gzip
 import numpy
 import operator
-import subprocess
-from subprocess import Popen, PIPE
-
-
-def get_version(cmd):
-	p = Popen(cmd+" -v", shell=True, stdout=PIPE, stderr=PIPE)
-	stdout, stderr = p.communicate()
-	return stderr.strip().split()[-1]
-	
 
 def parse_log(log):
     """
@@ -52,7 +43,6 @@ def parse_log(log):
     cstacks_dict={"evol_cat":[[0,0]]}
     FH_log = open(log)
     
-    version=""
     end_cstacks=False
     first_stacks_title = ""
 
@@ -77,8 +67,6 @@ def parse_log(log):
     if len(cstacks_dict["evol_cat"]) == 1:
         cstacks_dict=dict()
         
-    #~ print "parse log"
-    #~ print "\t", cstacks_dict, first_stacks_title
     return cstacks_dict , first_stacks_title
 
 def is_gzip( file ):
@@ -490,20 +478,23 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
             # parse haplotype
             haplotypes = line.strip().split("\t")[start:]
             alleles = list()
+            nb_genotyped = int(line.strip().split()[1])
             for idx,hap in enumerate(haplotypes):
                 sample = samples[idx]
                 # count unknown haplotype per sample
-                if hap == "-":
+                if hap == "-" and nb_genotyped > len(samples)/2 :
                     haplotype_stat["zygosity_detail"]["samples"][sample][0] += 1
                 # count heterozygote haplotype per sample
                 elif "/" in hap:
                     for a in hap.split("/"):
                         if not a in alleles:
                             alleles.append(a)
-                    haplotype_stat["zygosity_detail"]["samples"][sample][1] += 1
+                    if nb_genotyped > len(samples)/2 :
+                        haplotype_stat["zygosity_detail"]["samples"][sample][1] += 1
                 # count homozygote haplotype per sample
                 else:
-                    haplotype_stat["zygosity_detail"]["samples"][sample][2] += 1
+                    if nb_genotyped > len(samples)/2 :
+                        haplotype_stat["zygosity_detail"]["samples"][sample][2] += 1
                     if not hap == "consensus" and not hap in alleles:
                         alleles.append(hap)
             # count number of polymorphic cluster with 1 SNP and 2 alleles
