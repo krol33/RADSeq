@@ -83,7 +83,7 @@ while [ $r == 0 ] ; do qstat -j $id_denovo_job >& /dev/null ; r=$? ; sleep 10s ;
 grep -E 'Catalog|consensus' $OUT_DIR/batch_1.haplotypes.tsv > $OUT_DIR/locus_monomorphes.txt
 	# pour les locus polymorphes ajout des couvertures total et allelique à chaque genotype individuel
 grep -v consensus $OUT_DIR/batch_1.haplotypes.tsv > $OUT_DIR/tmp_poly
-datamash transpose < $input/tmp_poly > $input/tmp_poly_transposed
+datamash transpose < $OUT_DIR/tmp_poly > $OUT_DIR/tmp_poly_transposed
 rm $OUT_DIR/tmp_poly
 python $SCRIPT_DIR/add_cov_to_tab.py -i $OUT_DIR/tmp_poly_transposed -d $OUT_DIR -o $OUT_DIR/tmp_poly_cov_transposed
 rm $OUT_DIR/tmp_poly_transposed 
