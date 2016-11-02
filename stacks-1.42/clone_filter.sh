@@ -22,8 +22,8 @@ f1=$outdir/`basename $f1`
 f2=$outdir/`basename $f2`
 fi
 
-echo "CMD:		$stacks_dir/clone_filter -1 $f1 -2 $f2 -o $outdir -i fastq -y fastq" 
-$stacks_dir/clone_filter -1 $f1 -2 $f2 -o $outdir -i fastq -y fastq
+echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/clone_filter -1 $f1 -2 $f2 -o $outdir -i fastq -y fastq" 
+module load compiler/gcc-4.9.1 ; $stacks_dir/clone_filter -1 $f1 -2 $f2 -o $outdir -i fastq -y fastq
 
 base=`basename $f1 | sed 's/_1.fq/ /' | awk '{print $1}'`
 

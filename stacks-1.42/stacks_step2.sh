@@ -111,7 +111,7 @@ then
 args=`awk -v U=$STACKS1_DIR '{s=s" -s "U"/"$1}END{print s}' $POP_FILE`
 fi
 
-cmd=`echo $stacks_dir/cstacks -b 1 $args -o $CSTACKS_DIR -p $THREADS -n $MISMATCH `
+cmd=`echo module load compiler/gcc-4.9.1 ; $stacks_dir/cstacks -b 1 $args -o $CSTACKS_DIR -p $THREADS -n $MISMATCH `
 
 # à partir d'un catalogue 
 if [[ -n $KNOWN_CAT ]]

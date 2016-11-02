@@ -8,8 +8,8 @@ libR=$5
 STAT_DIR=$6
 OPT=$7
 
-echo $bin_dir/genotypes -b 1 -P $input -t GEN -r 1 -c -s -o joinmap $OPT
-$bin_dir/genotypes -b 1 -P $input -t GEN -r 1 -c -s -o joinmap $OPT 
+echo module load compiler/gcc-4.9.1 ; $bin_dir/genotypes -b 1 -P $input -t GEN -r 1 -c -s -o joinmap $OPT
+module load compiler/gcc-4.9.1 ; $bin_dir/genotypes -b 1 -P $input -t GEN -r 1 -c -s -o joinmap $OPT 
 
 mkdir $input/input
 mv $input/*tags.tsv* $input/input

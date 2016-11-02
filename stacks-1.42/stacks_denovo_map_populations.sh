@@ -66,7 +66,7 @@ fi
 sample=`awk -v I=$IN_DIR '{s=s"-s "I"/"$2".fq.gz "}END{print s}' $INDIV_FILE`
 
 # -t = -d -r dans ustacks
-cmd_line="perl /usr/local/bioinfo/src/Stacks/stacks-1.35/scripts/denovo_map.pl $sample -o $OUT_DIR -t -m $MIN_DEPTH -M $MAX_PRIM_DIST -N $MAX_SEC_DIST -n 1 -T 10 -O $POP_FILE -b 1 -i 1 -e $stacks_dir -S "
+cmd_line="module load compiler/gcc-4.9.1 ; perl /usr/local/bioinfo/src/Stacks/stacks-1.35/scripts/denovo_map.pl $sample -o $OUT_DIR -t -m $MIN_DEPTH -M $MAX_PRIM_DIST -N $MAX_SEC_DIST -n 1 -T 10 -O $POP_FILE -b 1 -i 1 -e $stacks_dir -S "
 if [[ $MAC_LOCUS_STACKS != "" ]]
 then
   cmd_line=$cmd_line" -X \"ustacks:--max_locus_stacks 3\""

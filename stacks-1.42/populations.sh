@@ -8,8 +8,8 @@ libR=$5
 STAT_DIR=$6
 OPT=$7
 
-echo $bin_dir/populations -P $input -M $map -b 1 -k -t 10 --fstats $OPT
-$bin_dir/populations -P $input -M $map -b 1 -k -t 10 --fstats $OPT
+echo module load compiler/gcc-4.9.1 ; $bin_dir/populations -P $input -M $map -b 1 -k -t 10 --fstats $OPT
+module load compiler/gcc-4.9.1 ; $bin_dir/populations -P $input -M $map -b 1 -k -t 10 --fstats $OPT
 
 echo "Stacks populations finished" >&2
 

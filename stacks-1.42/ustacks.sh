@@ -11,5 +11,5 @@ maxLocus=$8
 opt=$9
 
 # search stack for one individual
-echo "$bin_dir/ustacks -t gzfastq -f $read1 -i $id -o $out -d -r -m $cov -M $mismatch -N $mismatch2 --max_locus_stacks $maxLocus $opt"
-$bin_dir/ustacks -t gzfastq -f $read1 -i $id -o $out -d -r -m $cov -M $mismatch -N $mismatch2 --max_locus_stacks $maxLocus $opt
+echo "module load compiler/gcc-4.9.1 ; $bin_dir/ustacks -t gzfastq -f $read1 -i $id -o $out -d -r -m $cov -M $mismatch -N $mismatch2 --max_locus_stacks $maxLocus $opt"
+module load compiler/gcc-4.9.1 ; $bin_dir/ustacks -t gzfastq -f $read1 -i $id -o $out -d -r -m $cov -M $mismatch -N $mismatch2 --max_locus_stacks $maxLocus $opt
