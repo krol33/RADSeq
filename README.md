@@ -11,7 +11,7 @@ si vous n'avez pas de dépôt git local il vous suffit simplement de créer un r
 	mkdir /save/USER/git
 	cd /save/USER/git
 
-	git clone https://github.com/mariabernard/RADSeq.git
+	git clone -b stacks-1.35 https://github.com/mariabernard/RADSeq.git
 	git clone https://github.com/mariabernard/libR.git
 
 Pour mettre à jour votre dépôt
