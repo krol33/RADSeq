@@ -22,6 +22,7 @@ SCRIPT_DIR=[Script_path_dir]
 # input
 INDIV_FILE=$RAD_DIR/indiv_barcode.txt
 POP_FILE=$RAD_DIR/population.map
+dos2unix $POP_FILE
 IN_DIR=$RAD_DIR/preprocessing/stacks_input
 OUT_DIR=$RAD_DIR/denovo_map_populations
 SGE=$RAD_DIR/SGE_out/denovo_map_populations
