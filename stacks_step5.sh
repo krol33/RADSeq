@@ -21,6 +21,7 @@ SCRIPT_DIR=[Script_path_dir]
 INDIV_FILE=$RAD_DIR/indiv_barcode.txt
 dos2unix $INDIV_FILE
 POP_FILE=$RAD_DIR/${ANALYSIS_TYPE}/pop_extract.map
+dos2unix $POP_FILE
 HAPLOTYPE_DIR=$RAD_DIR/${ANALYSIS_TYPE}
 POLYMORPHES_LOCUS=$HAPLOTYPE_DIR/locus_polymorphes.txt
 
