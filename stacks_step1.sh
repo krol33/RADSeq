@@ -159,6 +159,10 @@ done
 r=0;
 while [ $r == 0 ] ; do qstat -j $id_gzip_d >& /dev/null ; r=$? ; sleep 10s ; done 
 
+# HTML statistics
+qsub -N $Proj_Name"_stacks_summary" -b y "python2.7 $SCRIPT_DIR/stacks_summary.py --res-dir $OUT_DIR/ --pop-map $POP_FILE --summary $STAT_DIR/summary.html --stacks-prog ustacks"
+
+
 echo -e "\n#CLUSTER" >> $STAT_DIR/summary_statistics.txt
 echo -e "\n#CLUSTER" >&2
 # nombre de cluster
