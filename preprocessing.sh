@@ -16,10 +16,10 @@ trim=$7
 
 if [[ $trim = 1 ]]
 then
-echo  "CMD:		$script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt"
-$script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt
+echo  "CMD:		perl $script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt"
+perl $script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt
 else
 # attention le barcode sur la lecture 2 doit être de la même taille que sur la lecture 1. La recherche se fait uniquement sur la lecture 1
-echo  "CMD:		$script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim2 --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt"
-$script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim2 --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt
+echo  "CMD:		perl $script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim2 --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt"
+perl $script_dir/splitbc.pl $f1 $f2 --mismatches $mismatch --bcfile $barcode --bol --trim2 --prefix-r1 ${prefix}%_1.fq --prefix-r2 ${prefix}%_2.fq --no_adapt
 fi

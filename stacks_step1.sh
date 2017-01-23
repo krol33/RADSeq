@@ -22,7 +22,7 @@ RAD_DIR=[Project_path_dir]
 SCRIPT_DIR=[Script_path_dir]
 
 # input
-PREPROCESSING_DIR=$RAD_DIR/preprocessing
+PREPROCESSING_DIR=$RAD_DIR/preprocessing/stacks_input
 
 INDIV_FILE=$RAD_DIR/indiv_barcode.txt
 dos2unix $INDIV_FILE
@@ -80,21 +80,21 @@ run=`echo $line | awk '{print $3}'`
 # PSTACKS
 if [[ $GENOME != "" ]]
 then
-	cmd_line="$SCRIPT_DIR/pstacks.sh --genomeIndex=$GENOME --read1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*1.fq.gz | grep -v "rem" `
+	cmd_line="$SCRIPT_DIR/pstacks.sh --genomeIndex=$GENOME --read1="`ls $PREPROCESSING_DIR/${indiv}_*1.fq.gz | grep -v "rem" `
 	
 	rem1=""
-	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.1.fq.gz" ` ]]
-		then cmd_line=$cmd_line" --rem1="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.1.fq.gz`
+	if [[ -e `ls $PREPROCESSING_DIR/${indiv}_* | grep "rem.1.fq.gz" ` ]]
+		then cmd_line=$cmd_line" --rem1="`ls $PREPROCESSING_DIR/${indiv}_*rem.1.fq.gz`
 	fi
 	
 	read2=""
-	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" ` ]]
-		then cmd_line=$cmd_line" --read2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*2.fq.gz | grep -v "rem" `
+	if [[ -e `ls $PREPROCESSING_DIR/${indiv}_*2.fq.gz | grep -v "rem" ` ]]
+		then cmd_line=$cmd_line" --read2="`ls $PREPROCESSING_DIR/${indiv}_*2.fq.gz | grep -v "rem" `
 	fi
 	
 	rem2=""
-	if [[ -e `ls $PREPROCESSING_DIR/stacks_input/${indiv}_* | grep "rem.2.fq.gz"` ]]
-		then cmd_line=$cmd_line" --rem2="`ls $PREPROCESSING_DIR/stacks_input/${indiv}_*rem.2.fq.gz`
+	if [[ -e `ls $PREPROCESSING_DIR/${indiv}_* | grep "rem.2.fq.gz"` ]]
+		then cmd_line=$cmd_line" --rem2="`ls $PREPROCESSING_DIR/${indiv}_*rem.2.fq.gz`
 	fi
 	
 	if [[ $DDRAD == 1 ]]
@@ -108,9 +108,9 @@ else
 	is_HD=`awk -v I=$indiv -v P="$POP_HD" '{if($1==I && match(P,$2)){print "hd"}}' $POP_FILE`
 	if [[ "$is_HD" == "hd" ]]
 	then
-		echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST 2 \"$STACKS_OPT\"" >> $SGE/stacks1.array
+		echo "sh $SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST 2 \"$STACKS_OPT\"" >> $SGE/stacks1.array
 	else
-		echo "$SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/stacks_input/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST $MAC_LOCUS_STACKS \"$STACKS_OPT\"" >> $SGE/stacks1.array
+		echo "sh $SCRIPT_DIR/ustacks.sh $PREPROCESSING_DIR/${indiv}.fq.gz $id $OUT_DIR $stacks_dir $MIN_DEPTH $MAX_PRIM_DIST $MAX_SEC_DIST $MAC_LOCUS_STACKS \"$STACKS_OPT\"" >> $SGE/stacks1.array
 	fi
 fi
 done

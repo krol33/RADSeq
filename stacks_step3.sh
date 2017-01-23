@@ -53,7 +53,7 @@ fi
 cat $INDIV_FILE | while read line
 do
 indiv=`echo $line | awk '{print $2}'`
-echo "$SCRIPT_DIR/sstacks.sh $STACKS1_DIR/${indiv} $CSTACKS_DIR $SSTACKS_DIR $stacks_dir $OPT" >> $SGE/sstacks.qarray
+echo "sh $SCRIPT_DIR/sstacks.sh $STACKS1_DIR/${indiv} $CSTACKS_DIR $SSTACKS_DIR $stacks_dir $OPT" >> $SGE/sstacks.qarray
 done
 
 id_sstacks=`qarray -terse -N ${Proj_Name}_sstacks -o $SGE -e $SGE $SGE/sstacks.qarray | awk -F "." '{print $1}'`

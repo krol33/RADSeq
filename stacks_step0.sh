@@ -197,7 +197,7 @@ do
 run=`echo $line | awk '{print $3}'`
 mkdir -p $run/clone_filter
 indiv=`echo $line | awk '{print $2}'`
-echo "$SCRIPT_DIR/clone_filter.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/clone_filter $stacks_dir" >> $SGE/clone_filter_$run.qarray
+echo "sh $SCRIPT_DIR/clone_filter.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/clone_filter $stacks_dir" >> $SGE/clone_filter_$run.qarray
 done
 
 job_id_clone_filter=""
