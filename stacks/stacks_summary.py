@@ -504,7 +504,7 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
 
     # add heterozygot rate per sample in zigosity details
     for sample in haplotype_stat["zygosity_detail"]["samples"]:
-        Hz_rate = round(haplotype_stat["zygosity_detail"]["samples"][sample][1] * 100.0 / sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]),2)
+        Hz_rate = round(haplotype_stat["zygosity_detail"]["samples"][sample][1] * 100.0 / sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]),2) if sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]) > 0 else 0.0
         haplotype_stat["zygosity_detail"]["samples"][sample][3] = Hz_rate
 
     # Add pop ID information:
