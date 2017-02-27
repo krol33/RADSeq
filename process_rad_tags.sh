@@ -16,11 +16,11 @@ type=`echo $f1 | awk '{if(match($1,".gz") > 0 ){print "gzfastq"}else{print "fast
 
 if [[ "$max_len" -gt 0 ]]
 then
-echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 -t $max_len --retain_header" 
-module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 -t $max_len --retain_header
+echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -r -q -c -E phred33 -s 20 -t $max_len --retain_header" 
+module load compiler/gcc-4.9.1; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -c -r -q -E phred33 -s 20 -t $max_len --retain_header
 else
-echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 --retain_header" 
-module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 --retain_header
+echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -c -r -q -E phred33 -s 20 --retain_header" 
+module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -f $f1 -o $outdir -e $enz -i $type -y fastq --filter_illumina -c -r -q -E phred33 -s 20 --retain_header
 fi
 
 if [[ "$type" != "gzfastq" && ! -h $f1 ]]

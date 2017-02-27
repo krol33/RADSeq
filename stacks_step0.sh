@@ -18,6 +18,7 @@ date >&2
 Proj_Name=[Proj_Name]
 
 # VARIABLES GENERALES
+# fonctionne aussi avec 1.44
 stacks_dir=/usr/local/bioinfo/src/Stacks/stacks-1.42/bin
 RAD_DIR=[Project_path_dir]
 SCRIPT_DIR=[Script_path_dir]
@@ -25,6 +26,7 @@ SCRIPT_DIR=[Script_path_dir]
 # input
 DATA_DIR=$RAD_DIR/data
 INDIV_FILE=$RAD_DIR/indiv_barcode.txt
+dos2unix $INDIV_FILE
 POP_FILE=$RAD_DIR/population.map
 dos2unix $POP_FILE
 
@@ -51,7 +53,7 @@ paired=1
 
 # voulez vous supprimer les duplicats PCR oui : dereplication=1, non : dereplication=0. 
 # !! attention vallable uniquement sur single digest pair end!!
-dereplication=0
+dereplication=1
 
 # nombre de mismatch autorisé sur les barcodes BMM sur le tag de restriction qui suit TMM
 BMM=0
@@ -61,7 +63,6 @@ TRIM=1
 LEN=
 
 ################### CHECKS ##################################
-dos2unix $INDIV_FILE
 check=`cut -f 2 $INDIV_FILE | sort | uniq -c | awk '$1>1'`
 if [[ $check == "" ]]
 then echo "all sample names are uniq"
@@ -157,7 +158,7 @@ fi
 # affiché le nombre de jobs terminés s'il est différent d'avant
 if [[ "$finished" -ne "$jf" ]]
 then
-echo "    $jf paire filtered among $nj"
+echo "    $jf paire demultiplexed among $nj"
 finished=$jf
 fi
 sleep 10s
@@ -168,7 +169,7 @@ jf=`grep "Epilog" $SGE/${Proj_Name}_preprocessing*.out | wc -l`
 if [[ "$finished" -ne "$jf" ]]
 then
 jf=`grep "Epilog" $SGE/${Proj_Name}_preprocessing*.out | wc -l`
-echo "    $jf paire filtered among $nj"
+echo "    $jf paire demultiplexed among $nj"
 fi
 
 for run in $Run
@@ -194,10 +195,10 @@ fi
 
 cat $INDIV_FILE | while read line
 do
-run=`echo $line | awk '{print $3}'`
-mkdir -p $run/clone_filter
-indiv=`echo $line | awk '{print $2}'`
-echo "$SCRIPT_DIR/clone_filter.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/clone_filter $stacks_dir" >> $SGE/clone_filter_$run.qarray
+	run=`echo $line | awk '{print $3}'`
+	mkdir -p $run/clone_filter
+	indiv=`echo $line | awk '{print $2}'`
+	echo "sh $SCRIPT_DIR/clone_filter.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/clone_filter $stacks_dir" >> $SGE/clone_filter_$run.qarray
 done
 
 job_id_clone_filter=""
@@ -228,17 +229,17 @@ do
 	run=`echo $line | awk '{print $3}'`
 	mkdir -p $run/checkRAD
 	indiv=`echo $line | awk '{print $2}'`
-if [[ $double_digest = 0 ]]
-then
-	if [[ $dereplication = 1 ]]
+	if [[ $double_digest = 0 ]]
 	then
-		echo "sh $SCRIPT_DIR/process_rad_tags.sh `ls $run/clone_filter/${indiv}_cloneF_1.fq.gz` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
+		if [[ $dereplication = 1 ]]
+		then
+			echo "sh $SCRIPT_DIR/process_rad_tags.sh `ls $run/clone_filter/${indiv}_cloneF_1.fq.gz` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
+		else
+			echo "sh $SCRIPT_DIR/process_rad_tags.sh `ls $run/${indiv}_1.fq*` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
+		fi
 	else
-		echo "sh $SCRIPT_DIR/process_rad_tags.sh `ls $run/${indiv}_1.fq*` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
+		echo "sh $SCRIPT_DIR/process_ddrad_tags.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
 	fi
-else
-	echo "sh $SCRIPT_DIR/process_ddrad_tags.sh `ls $run/${indiv}_1.fq*` `ls $run/${indiv}_2.fq*` $run/checkRAD $Enzyme $stacks_dir $LEN " >> $SGE/process_rad_tags_$run.qarray
-fi
 done
 
 job_id_process_rad_tags=""
@@ -257,59 +258,54 @@ done
 # le filtre qualité n'a été lancé que sur la lecture 1. Cela génère 2 fichiers par fastq. Il s'agit maintenant de reconstituer des fichiers pairés.
 if [[ $paired = 1 && $double_digest = 0 ]]
 then
-date
-echo -e "\nREORDONNANCEMENT DES PAIRES DE FICHIERS FASTQ"
-echo -e "\nREORDONNANCEMENT DES PAIRES DE FICHIERS FASTQ" >&2
-cd $RAD_DIR
+	date
+	echo -e "\nREORDONNANCEMENT DES PAIRES DE FICHIERS FASTQ"
+	echo -e "\nREORDONNANCEMENT DES PAIRES DE FICHIERS FASTQ" >&2
+	cd $RAD_DIR
 
-if [[ $(ls $SGE/ | grep -c recoverMate) -gt 0  ]]
-then
-rm $SGE/*recoverMate*
-fi
+	if [[ $(ls $SGE/ | grep -c recoverMate) -gt 0  ]]
+	then
+	rm $SGE/*recoverMate*
+	fi
 
-cat $INDIV_FILE | while read line
-do
-run=`echo $line | awk '{print $3}'`
-indiv=`echo $line | awk '{print $2}'`
-if [[ $dereplication = 1 ]]
-then
-echo "sh $SCRIPT_DIR/recover_mate.sh `ls $OUT_DIR/$run/checkRAD/${indiv}_cloneF_1*discards` `ls $OUT_DIR/$run/clone_filter/${indiv}_cloneF_2.fq*`" >> $SGE/recoverMateDiscards.qarray
-echo "sh $SCRIPT_DIR/recover_mate.sh $OUT_DIR/$run/checkRAD/${indiv}_cloneF_1.fq `ls $OUT_DIR/$run/clone_filter/${indiv}_cloneF_2.fq* `" >> $SGE/recoverMate.qarray
-else
-echo "sh $SCRIPT_DIR/recover_mate.sh `ls $OUT_DIR/$run/checkRAD/${indiv}_1.fq*discards` `ls $OUT_DIR/$run/${indiv}_2.fq*`" >> $SGE/recoverMateDiscards.qarray
-echo "sh $SCRIPT_DIR/recover_mate.sh $OUT_DIR/$run/checkRAD/${indiv}_1.fq `ls $OUT_DIR/$run/${indiv}_2.fq* `" >> $SGE/recoverMate.qarray
-fi
-done
+	cat $INDIV_FILE | while read line
+	do
+	run=`echo $line | awk '{print $3}'`
+	indiv=`echo $line | awk '{print $2}'`
+	if [[ $dereplication = 1 ]]
+	then
+	echo "sh $SCRIPT_DIR/recover_mate.sh $OUT_DIR/$run/checkRAD/${indiv}_cloneF_1.fq `ls $OUT_DIR/$run/clone_filter/${indiv}_cloneF_2.fq* `" >> $SGE/recoverMate.qarray
+	else
+	echo "sh $SCRIPT_DIR/recover_mate.sh $OUT_DIR/$run/checkRAD/${indiv}_1.fq `ls $OUT_DIR/$run/${indiv}_2.fq* `" >> $SGE/recoverMate.qarray
+	fi
+	done
 
-job_id_recov_dis=`qarray -terse -N ${Proj_Name}_recoverMateDiscards -o $SGE -e $SGE $SGE/recoverMateDiscards.qarray`
-job_id_recov_ok=`qarray -terse -N ${Proj_Name}_recoverMate -o $SGE -e $SGE $SGE/recoverMate.qarray`
+	job_id_recov_ok=`qarray -terse -N ${Proj_Name}_recoverMate -o $SGE -e $SGE $SGE/recoverMate.qarray`
 
-r=0;
-while [ $r == 0 ] ; do qstat -j $job_id_recov_dis >& /dev/null ; r=$? ; sleep 10s ; done
-r=0;
-while [ $r == 0 ] ; do qstat -j $job_id_recov_ok >& /dev/null ; r=$? ; sleep 10s ; done
+	r=0;
+	while [ $r == 0 ] ; do qstat -j $job_id_recov_ok >& /dev/null ; r=$? ; sleep 10s ; done
 
 else
-cat $INDIV_FILE | while read line
-do
-run=`echo $line | awk '{print $3}'`
-indiv=`echo $line | awk '{print $2}'`
-echo "gzip $OUT_DIR/$run/checkRAD/${indiv}_*" >> $SGE/gzip_process_radtag.qarray
-done
+	cat $INDIV_FILE | while read line
+	do
+	run=`echo $line | awk '{print $3}'`
+	indiv=`echo $line | awk '{print $2}'`
+	echo "gzip $OUT_DIR/$run/checkRAD/${indiv}_*" >> $SGE/gzip_process_radtag.qarray
+	done
 
-job_id_gzip=`qarray -terse -N ${Proj_Name}_gzip -o $SGE -e $SGE $SGE/gzip_process_radtag.qarray`
+	job_id_gzip=`qarray -terse -N ${Proj_Name}_gzip -o $SGE -e $SGE $SGE/gzip_process_radtag.qarray`
 
-r=0;
-while [ $r == 0 ] ; do qstat -j $job_id_gzip >& /dev/null ; r=$? ; sleep 10s ; done
+	r=0;
+	while [ $r == 0 ] ; do qstat -j $job_id_gzip >& /dev/null ; r=$? ; sleep 10s ; done
 fi
 
-#~ ############################ CREATION DOSSIER INPUT u/pstacks #############################################
+############################ CREATION DOSSIER INPUT u/pstacks #############################################
 mkdir -p $OUT_DIR/stacks_input
 
 cat $INDIV_FILE | while read line
 do
-run=`echo $line | awk '{print $3}'`
-indiv=`echo $line | awk '{print $2}'`
+	run=`echo $line | awk '{print $3}'`
+	indiv=`echo $line | awk '{print $2}'`
 
 	if [[ $align == 1 ]]
 	then
@@ -344,7 +340,7 @@ date
 echo -e "\nSTATISTICS\n"
 echo -e "\nSTATISTICS\n" >&2
 
-echo -e "#run\tpop\tindiv\tdemultiplexed_pairs\tparis_duplicated_removed\tlowqual_read_removed\tbadTAG_read\tfinal_retained_reads" > $STAT_DIR/read_count.txt
+echo -e "#run\tpop\tindiv\tdemultiplexed_pairs\tpairs_duplicated_removedt\tIllumina_chastity_filter\tlowqual_read_removed\tbadTAG_read\tfinal_retained_reads" > $STAT_DIR/read_count.txt
 for run in $Run
 do
 idx=1
@@ -365,18 +361,20 @@ nb_dup=`tail -n 1 $SGE/${Proj_Name}_clone_filter_$run.e*.$idx | awk '{print $12}
 else
 nb_dup=0
 fi
-nb_lowqual=`tail -n 3 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep "low quality" | awk '{print $1}'`
+nb_IllFail=`tail -n 6 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep "failed Illumina filtered reads" | awk '{print $1}'`
+nb_lowqual=`tail -n 6 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep "low quality" | awk '{print $1}'`
 nb_badRAD=`tail -n 6 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep 'ambiguous RAD-Tag drops' | awk '{print $1}'`
-nb_retain=`tail -n 3 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep "retained" | awk '{print $1}'`
-
-echo -e "$run\t$pop\t$indiv\t$nb_read\t$nb_dup\t$nb_lowqual\t$nb_badRAD\t$nb_retain" >> $STAT_DIR/read_count.txt
+nb_retain=`tail -n 6 $SGE/${Proj_Name}_process_rad_tags_$run.e*.$idx | grep "retained" | awk '{print $1}'`
+echo -e "$run\t$pop\t$indiv\t$nb_read\t$nb_dup\t$nb_IllFail\t$nb_lowqual\t$nb_badRAD\t$nb_retain" >> $STAT_DIR/read_count.txt
 let idx+=1 
 done
+
 Tdemult=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 4 | awk -v D=$double_digest '{if(D==1){print $4*2}else{print $4}}'`
 Tdup=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt| colstat.sh 5 | awk -v D=$double_digest '{if(D==1){print $4*2}else{print $4}}'`
-Tlowqual=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 6 | awk '{print $4}'`
-TbadRAD=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 7 | awk '{print $4}'`
-Tretained=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 8 | awk '{print $4}'`
+TIllFail=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 6 | awk '{print $4}'`
+Tlowqual=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 7 | awk '{print $4}'`
+TbadRAD=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 8 | awk '{print $4}'`
+Tretained=`awk -v R=$run '$1==R' $STAT_DIR/read_count.txt | colstat.sh 9 | awk '{print $4}'`
 if [[ "$type" = "gzfastq" && -e $OUT_DIR/$run/unmatched_1.fq.gz ]]
 then 
 unmap=`zcat $OUT_DIR/$run/unmatched_1.fq.gz | wc -l | awk '{print $1/4}'`
@@ -416,6 +414,7 @@ if [[ $dereplication == 1 ]]
 then
 let per_cloneF=$Tdup*100/$Ttot
 fi
+let per_IllFail=$TIllFail*100/$Ttot
 let per_lowQual=$Tlowqual*100/$Ttot
 let per_badRAD=$TbadRAD*100/$Ttot
 let per_qualFil=$Tretained*100/$Ttot
@@ -424,36 +423,38 @@ let per_ambiguous=$ambiguous*100/$Ttot
 let per_2rad=$dbrad*100/$Ttot
 if [[ $double_digest == 1 ]]
 then
-echo "" >> $STAT_DIR/summary.stat
-echo "$run :" >> $STAT_DIR/summary.stat
-echo "    total reads : $Ttot" >> $STAT_DIR/summary.stat
-echo "    wrong barcode : $unmap ($per_unmap %)" >> $STAT_DIR/summary.stat
-echo "    ambiguous barcode : $ambiguous ($per_ambiguous %)" >> $STAT_DIR/summary.stat
-echo "    2 rad tag : $dbrad ($per_2rad %)" >> $STAT_DIR/summary.stat
-echo "    barcoded : $Tdemult ($per_demult %)" >> $STAT_DIR/summary.stat
-echo "        low quality read1: $Tlowqual ($per_lowQual %)" >> $STAT_DIR/summary.stat
-echo "        bad RADTag: $TbadRAD ($per_badRAD %)" >> $STAT_DIR/summary.stat
-echo "        quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat 
+	echo "" >> $STAT_DIR/summary.stat
+	echo "$run :" >> $STAT_DIR/summary.stat
+	echo "    total reads : $Ttot" >> $STAT_DIR/summary.stat
+	echo "    wrong barcode : $unmap ($per_unmap %)" >> $STAT_DIR/summary.stat
+	echo "    ambiguous barcode : $ambiguous ($per_ambiguous %)" >> $STAT_DIR/summary.stat
+	echo "    2 rad tag : $dbrad ($per_2rad %)" >> $STAT_DIR/summary.stat
+	echo "    barcoded : $Tdemult ($per_demult %)" >> $STAT_DIR/summary.stat
+	echo "        Illumina chastity/purity filter: $TIllFail ($per_IllFail %)" >> $STAT_DIR/summary.stat
+	echo "        low quality read1: $Tlowqual ($per_lowQual %)" >> $STAT_DIR/summary.stat
+	echo "        bad RADTag: $TbadRAD ($per_badRAD %)" >> $STAT_DIR/summary.stat
+	echo "        quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat 
 else
-echo "" >> $STAT_DIR/summary.stat
-echo "$run :" >> $STAT_DIR/summary.stat
-echo "    total pairs : $Ttot" >> $STAT_DIR/summary.stat
-echo "    wrong barcode : $unmap ($per_unmap %)" >> $STAT_DIR/summary.stat
-echo "    ambiguous barcode : $ambiguous ($per_ambiguous %)" >> $STAT_DIR/summary.stat
-echo "    2 rad tag : $dbrad ($per_2rad %)" >> $STAT_DIR/summary.stat
-echo "    barcoded : $Tdemult ($per_demult %)" >> $STAT_DIR/summary.stat
-if [[ $dereplication == 1 ]]
-then
-echo "        clone filtered paired: $Tdup ($per_cloneF %)" >> $STAT_DIR/summary.stat
-fi
-echo "        low quality read1: $Tlowqual ($per_lowQual %)" >> $STAT_DIR/summary.stat
-echo "        bad RADTag: $TbadRAD ($per_badRAD %)" >> $STAT_DIR/summary.stat
-if [[ $dereplication == 1 ]]
-then
-echo "        dereplicated, quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat
-else
-echo  "        quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat
-fi
+	echo "" >> $STAT_DIR/summary.stat
+	echo "$run :" >> $STAT_DIR/summary.stat
+	echo "    total pairs : $Ttot" >> $STAT_DIR/summary.stat
+	echo "    wrong barcode : $unmap ($per_unmap %)" >> $STAT_DIR/summary.stat
+	echo "    ambiguous barcode : $ambiguous ($per_ambiguous %)" >> $STAT_DIR/summary.stat
+	echo "    2 rad tag : $dbrad ($per_2rad %)" >> $STAT_DIR/summary.stat
+	echo "    barcoded : $Tdemult ($per_demult %)" >> $STAT_DIR/summary.stat
+	if [[ $dereplication == 1 ]]
+	then
+		echo "        clone filtered paired: $Tdup ($per_cloneF %)" >> $STAT_DIR/summary.stat
+	fi
+	echo "        Illumina chastity/purity filter: $TIllFail ($per_IllFail %)" >> $STAT_DIR/summary.stat
+	echo "        low quality read1: $Tlowqual ($per_lowQual %)" >> $STAT_DIR/summary.stat
+	echo "        bad RADTag: $TbadRAD ($per_badRAD %)" >> $STAT_DIR/summary.stat
+	if [[ $dereplication == 1 ]]
+	then
+		echo "        dereplicated, quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat
+	else
+		echo  "        quality filtered and RAD checked : $Tretained ($per_qualFil %)" >> $STAT_DIR/summary.stat
+	fi
 fi
 done
 echo -e "\nEND OF PREPROCESSING STEP"

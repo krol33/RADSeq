@@ -18,11 +18,11 @@ type=`echo $f1 | awk '{if(match($1,".gz") > 0 ){print "gzfastq"}else{print "fast
 
 if [[ "$max_len" -gt 0 ]]
 then
-echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 -t $max_len --retain_header" 
-module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1 --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 -t $max_len --retain_header
+echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -s 20 -t $max_len --retain_header" 
+module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1 --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -s 20 -t $max_len --retain_header
 else
-echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 --retain_header" 
-module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -D -s 20 --retain_header
+echo "CMD:		module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -s 20 --retain_header" 
+module load compiler/gcc-4.9.1 ; $stacks_dir/process_radtags -1 $f1 -2 $f2 -o $outdir --renz_1 $enz1  --renz_2 $enz2 -i $type -y fastq --filter_illumina -r -q -E phred33 -s 20 --retain_header
 fi
 
 if [[ "$type" != "gzfastq" ]]
