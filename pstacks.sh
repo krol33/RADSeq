@@ -109,13 +109,13 @@ samtools view -h $to_filter_bam -q 20 -f 0x40 -F 0x0100 -bo $out/${indiv}_uniqMa
 final_bam=$out/${indiv}_uniqMapQ20_R1.bam
 fi
 
-# stat befor filtering
+# stat after filtering
 echo "Alignment statistics after filtering (= input Stacks)"
 samtools flagstat $final_bam
 
 # search stack for one individual
-echo -e "PSTACKS:\n Cmd line : \t $bin_dir/pstacks -t bam -f $final_bam -i $id -o $out -m $cov $opt"
-$bin_dir/pstacks -t bam -f $final_bam -i $id -o $out -m $cov $opt
+echo -e "PSTACKS:\n Cmd line : \t module load compiler/gcc-4.9.1 ; $bin_dir/pstacks -t bam -f $final_bam -i $id -o $out -m $cov $opt"
+module load compiler/gcc-4.9.1 ; $bin_dir/pstacks -t bam -f $final_bam -i $id -o $out -m $cov $opt
 
 for i in `ls $out/${indiv}_uniqMapQ20*.tsv.gz`
 do
