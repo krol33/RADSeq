@@ -62,4 +62,4 @@ while [ $r == 0 ] ; do qstat -j $id_sstacks >& /dev/null ; r=$? ; sleep 10s ; do
 echo -e "\n###########################   SSTACK stat : $SSTACKS_DIR ######################################################"
 echo -e "\n###########################   SSTACK stat : $SSTACKS_DIR ######################################################" >&2 
 
-python /save/mbernard/script/git/galaxy_wrappers/stacks_summary.py --stacks-prog sstacks --res-dir $SSTACKS_DIR --pop-map $POP_FILE --summary $STAT_DIR/sstacks_summary.html
+python $SCRIPT_DIR/stacks_summary.py --stacks-prog sstacks --res-dir $SSTACKS_DIR --pop-map $POP_FILE --summary $STAT_DIR/sstacks_summary.html
