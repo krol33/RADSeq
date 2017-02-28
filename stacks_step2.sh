@@ -89,7 +89,7 @@ args=`awk -v P="$POP_IN" -v U=$STACKS1_DIR '{if (match(P,$2)){s=s" -s "U"/"$1}}E
 fi
 
 # tous sauf ceux des pop POP_OUT
-if [[ -n $POP_IN ]]
+if [[ -n $POP_OUT ]]
 then
 args=`awk -v P="$POP_OUT" -v U=$STACKS1_DIR '{if (! match(P,$2)){s=s" -s "U"/"$1}}END{print s}' $POP_FILE `
 fi
