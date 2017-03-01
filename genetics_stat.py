@@ -70,13 +70,13 @@ def readGenotype(infile,dicPop, multiallelic, ambiguous, dic):
         for ind in nameInd:    # par des locus
             pop=dicPop[ind]
             
-            indAllelList=[a for a in dic[locus]["ind"][ind].split('/')]    # lecture du genotype et split des alleles. On ne va analyser que les genotypes connus et au max biallèlique
+            indAllelList=[a for a in dic[locus]["ind"][ind].split('/')]    # lecture du genotype et split des alleles. On ne va analyser que les genotypes connus et au max biallÃ¨lique
             #~ if len(indAllelList) <=2 and dic[locus]["ind"][ind]!="-" and dic[locus]["ind"][ind]!="?" :
             if dic[locus]["ind"][ind] =="-":
                 dic[locus]["ind"].pop(ind)
             elif ambiguous == False and dic[locus]["ind"][ind] =="?" :
                 dic[locus]["ind"].pop(ind)  
-            elif not  multiallelic and len(indAllelList) > 2:
+            elif multiallelic == False and len(indAllelList) > 2:
                 dic[locus]["ind"].pop(ind)
             else :
                 if len(indAllelList)==1 : 
@@ -97,9 +97,9 @@ def readGenotype(infile,dicPop, multiallelic, ambiguous, dic):
 ##############
 # dicPop={"ind":{},"pop":{}}
 # dicGenotype: 
-# dicGenotype[locus]: "ind": dictionnaire de génotype par individus
-# dicGenotype[locus]: "code_chiffre": dictionnaire des code alleles clé=chiffre, valeur = allele
-# dicGenotype[locus]: "code_allel": dictionnaire des code alleles clé=allel, valeur = chiffre
+# dicGenotype[locus]: "ind": dictionnaire de gÃ©notype par individus
+# dicGenotype[locus]: "code_chiffre": dictionnaire des code alleles clÃ©=chiffre, valeur = allele
+# dicGenotype[locus]: "code_allel": dictionnaire des code alleles clÃ©=allel, valeur = chiffre
 def write_alleles_stat(out,detailed_out, dicGenotype,dicPop,maxAllel):
     
     FO=open(out,"w")
@@ -137,7 +137,7 @@ def write_alleles_stat(out,detailed_out, dicGenotype,dicPop,maxAllel):
         for p in dicPop["pop"].keys():
             dicPopAllel[p]=dict(zip(list(xrange(1,maxAllel)), [0]*maxAllel))
             dicPopAllel[p]["nb_ind"]=0
-        # parcours des génotypes et incrémentation des tableaux
+        # parcours des gÃ©notypes et incrÃ©mentation des tableaux
         for ind in dicGenotype[locus]["ind"]:
             p=dicPop["ind"][ind]
             gen=dicGenotype[locus]["ind"][ind]
@@ -211,7 +211,7 @@ def write_genotypes_stat(prefixout,dicGenotype,dicPop,maxAllel):
                     dicPopGenotype[p][`i`+"/"+`j`]=0
         
         genotype_count=Counter()
-        # parcours des génotypes et incrémentation des tableaux
+        # parcours des gÃ©notypes et incrÃ©mentation des tableaux
         for ind in dicGenotype[locus]["ind"]:
             p=dicPop["ind"][ind]
             gen=dicGenotype[locus]["ind"][ind]
@@ -262,7 +262,7 @@ def write_genotypes_stat(prefixout,dicGenotype,dicPop,maxAllel):
 parser = argparse.ArgumentParser(description="generate resume or detailed allele stastics and genotypes statistics")
 #params
 parser.add_argument('-m', '--multiallelic', default=False, action="store_true", help="take also account multiallelic genotypes (more thant 2 alleles), default = False")
-parser.add_argument('-a', '--ambiguous', default=True, action="store_false", help="do not take ambiguous genotype (?) as known allel ")
+parser.add_argument('-a', '--ambiguous', default=False, action="store_true", help="take also account of ambiguous genotype (?) as known allel ")
 parser.add_argument('-s', '--summarized', default=False, action="store_true", help="summarized alleles statistics")
 parser.add_argument('-d', '--detailed', default=False, action="store_true", help="detailed alleles statistics")
 parser.add_argument('-g', '--genotype-stat', default=False, action="store_true", help="detailed genetics statistics")
@@ -301,9 +301,9 @@ nb_pop=readPop( args.population_map ,dicPop)
 
 ###
 # dicGenotype: 
-# dicGenotype[locus]: "ind": dictionnaire de génotype par individus
-# dicGenotype[locus]: "code_chiffre": dictionnaire des code alleles clé=chiffre, valeur = allele
-# dicGenotype[locus]: "code_allel": dictionnaire des code alleles clé=allel, valeur = chiffre
+# dicGenotype[locus]: "ind": dictionnaire de gÃ©notype par individus
+# dicGenotype[locus]: "code_chiffre": dictionnaire des code alleles clÃ©=chiffre, valeur = allele
+# dicGenotype[locus]: "code_allel": dictionnaire des code alleles clÃ©=allele, valeur = chiffre
 print "read haplotype file : "+args.haplotype_tsv
 dicGenotype={}
 maxAllel = readGenotype(args.haplotype_tsv,dicPop["ind"],args.multiallelic, args.ambiguous, dicGenotype)

@@ -477,20 +477,23 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
             # parse haplotype
             haplotypes = line.strip().split("\t")[start:]
             alleles = list()
+            nb_genotyped = int(line.strip().split()[1])
             for idx,hap in enumerate(haplotypes):
                 sample = samples[idx]
                 # count unknown haplotype per sample
-                if hap == "-":
+                if hap == "-" and nb_genotyped > len(samples)/2 :
                     haplotype_stat["zygosity_detail"]["samples"][sample][0] += 1
                 # count heterozygote haplotype per sample
                 elif "/" in hap:
                     for a in hap.split("/"):
                         if not a in alleles:
                             alleles.append(a)
-                    haplotype_stat["zygosity_detail"]["samples"][sample][1] += 1
+                    if nb_genotyped > len(samples)/2 :
+                        haplotype_stat["zygosity_detail"]["samples"][sample][1] += 1
                 # count homozygote haplotype per sample
-                else:
-                    haplotype_stat["zygosity_detail"]["samples"][sample][2] += 1
+                elif hap != "-" :
+                    if nb_genotyped > len(samples)/2 :
+                        haplotype_stat["zygosity_detail"]["samples"][sample][2] += 1
                     if not hap == "consensus" and not hap in alleles:
                         alleles.append(hap)
             # count number of polymorphic cluster with 1 SNP and 2 alleles
@@ -500,7 +503,7 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
 
     # add heterozygot rate per sample in zigosity details
     for sample in haplotype_stat["zygosity_detail"]["samples"]:
-        Hz_rate = round(haplotype_stat["zygosity_detail"]["samples"][sample][1] * 100.0 / sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]),2)
+        Hz_rate = round(haplotype_stat["zygosity_detail"]["samples"][sample][1] * 100.0 / sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]),2) if sum(haplotype_stat["zygosity_detail"]["samples"][sample][1:3]) > 0 else 0.0
         haplotype_stat["zygosity_detail"]["samples"][sample][3] = Hz_rate
 
     # Add pop ID information:
