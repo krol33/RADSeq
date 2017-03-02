@@ -469,11 +469,6 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
             haplotype_stat["summary"]["values"][0] += 1
             if int(line.split()[cnt]) > 50.0*len(samples)/100:
                 haplotype_stat["summary"]["values"][1] += 1
-            if "/" in line:
-                nb_indiv_poly_clust.append(int(line.split()[cnt]))
-                haplotype_stat["summary"]["values"][2] += 1
-                if int(line.split()[cnt]) > 50.0*len(samples)/100:
-                    haplotype_stat["summary"]["values"][3] += 1
 
             # parse haplotype
             haplotypes = line.strip().split("\t")[start:]
@@ -496,6 +491,12 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
                         haplotype_stat["zygosity_detail"]["samples"][sample][2] += 1
                     if not hap == "consensus" and not hap in alleles:
                         alleles.append(hap)
+            # count number of polymorphic loci
+            if len(alleles) > 1 :
+                nb_indiv_poly_clust.append(int(line.split()[cnt]))
+                haplotype_stat["summary"]["values"][2] += 1
+                if int(line.split()[cnt]) > 50.0*len(samples)/100:
+                    haplotype_stat["summary"]["values"][3] += 1
             # count number of polymorphic cluster with 1 SNP and 2 alleles
             if len(alleles) == 2 and len(alleles[0]) == 1 :
                 haplotype_stat["summary"]["values"][4] += 1
@@ -530,7 +531,7 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
     for n,cl in nb_indiv_poly_clust_count:
         haplotype_stat["min_nb_indiv_per_cluster"]["polymorphic loci"].insert(0,[n,c + cl] )
         c += cl
-
+    
     # return Stacks program launched for tab title in HTML output file
     if start == 3:
         return "Genotypes"

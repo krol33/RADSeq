@@ -88,7 +88,7 @@ while [ $r == 0 ] ; do qstat -j $id >& /dev/null ; r=$? ; sleep 10s ; done
 echo -e "\n###########################   SSTACK stat : $OUT_DIR ######################################################"
 echo -e "\n###########################   SSTACK stat : $OUT_DIR ######################################################" >&2 
 
-python $SCRIPT_DIR/stacks_summary.py --stacks-prog $ANALYSIS_TYPE --res-dir $OUT_DIR --pop-map $POP_FILE --summary $STAT_DIR/${ANALYSIS_TYPE}_summary.html
+python $SCRIPT_DIR/stacks_summary.py --stacks-prog $ANALYSIS_TYPE --res-dir $OUT_DIR --pop-map $POP_FILE --summary $STAT_DIR/populations_summary.html
 
 mkdir $OUT_DIR/input
 mv $OUT_DIR/*tags.tsv* $OUT_DIR/input
@@ -96,14 +96,10 @@ mv $OUT_DIR/*snps.tsv* $OUT_DIR/input
 mv $OUT_DIR/*alleles.tsv* $OUT_DIR/input
 mv $OUT_DIR/*matches.tsv* $OUT_DIR/input
 mv $OUT_DIR/*models.tsv* $OUT_DIR/input
+NB_IND=`ls $OUT_DIR/input | grep -c matches.tsv`
 
 # recherche des génotypes ambigues, remplace "-" par "?"
-if [[ $ANALYSIS_TYPE == "populations" ]]
-then
 python $SCRIPT_DIR/retreat_haplotypes.tsv.py -i $OUT_DIR/batch_1.haplotypes.tsv -s $OUT_DIR/input -o $OUT_DIR/batch_1.haplotypes_amb.tsv
-else
-python $SCRIPT_DIR/retreat_haplotypes.tsv.py -i $OUT_DIR/batch_1.haplotypes_1.tsv -s $OUT_DIR/input -o $OUT_DIR/batch_1.haplotypes_amb.tsv
-fi
 
 # réordonnancement du tableaux en fonction de l'ordre fourni dans le fichier map
 head -n 1 $OUT_DIR/batch_1.haplotypes_amb.tsv | awk -v OUT=$OUT_DIR/batch_1.haplotypes_amb_ord.tsv -v IN=$OUT_DIR/batch_1.haplotypes_amb.tsv -v POP=$POP_FILE '{l=split($0,tab,"\t");
@@ -122,18 +118,37 @@ system( "cut -f "idx[$1]" "IN" | paste "OUT" - > "OUT"tmp; mv "OUT"tmp "OUT)
 rm $OUT_DIR/batch_1.haplotypes_amb.tsv
 
 # séparation des locus monomorphes des locus polymorphes
-grep -v '/' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/locus_monomorphes.txt
-	# pour les locus polymorphes ajout des couvertures total et allelique à chaque genotype individuel
-grep -E 'Catalog|/' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/tmp_poly
+awk -v M=$OUT_DIR/locus_monomorphes.txt -v P=$OUT_DIR/tmp_poly -v A=$ANALYSIS_TYPE 'BEGIN{cpt_start=2; if (A=="genotypes"){cpt_start=3}}{
+if(match($0,"Catalog")){
+        print $0>M; print $0>P
+}else{
+        if(match($0,"consensus")){
+                print $0>> M
+        }else{
+                if(match($0,"/")){
+                        print $0 >> P
+                }else{  
+                        n=0
+                        for (i =3; i<=NF; i++){
+                                if($i != "-" && $i != "?" && tab[$i]!=1){n++; tab[$i]=1 }
+                        }
+                        if (n==1){print $0 >> M}else{print $0 >>P}
+                        delete tab
+                }
+        }
+}
+}' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv
+
+# ajout des informations de couvertures aux locus polymorphes
 datamash transpose < $OUT_DIR/tmp_poly > $OUT_DIR/tmp_poly_transposed
 python $SCRIPT_DIR/add_cov_to_tab.py -i $OUT_DIR/tmp_poly_transposed -d $OUT_DIR/input -o $OUT_DIR/tmp_poly_cov_transposed
-if [[ $? == 0 ]]
+if [[ $? == 0 ]] # si réussi
 then
         rm $OUT_DIR/tmp_poly $OUT_DIR/tmp_poly_transposed
         datamash transpose < $OUT_DIR/tmp_poly_cov_transposed > $OUT_DIR/locus_polymorphes_cov.txt
         rm $OUT_DIR/tmp_poly_cov_transposed
         POLY=$OUT_DIR/locus_polymorphes_cov.txt
-else
+else # sinon
         rm $OUT_DIR/tmp_poly_transposed $OUT_DIR/tmp_poly_cov_transposed
         mv $OUT_DIR/tmp_poly $OUT_DIR/locus_polymorphes.txt
         POLY=$OUT_DIR/locus_polymorphes.txt
