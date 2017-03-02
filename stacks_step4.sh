@@ -122,21 +122,20 @@ system( "cut -f "idx[$1]" "IN" | paste "OUT" - > "OUT"tmp; mv "OUT"tmp "OUT)
 rm $OUT_DIR/batch_1.haplotypes_amb.tsv
 
 # séparation des locus monomorphes des locus polymorphes
-grep -E 'Catalog|consensus' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/locus_monomorphes.txt
+grep -v '/' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/locus_monomorphes.txt
 	# pour les locus polymorphes ajout des couvertures total et allelique à chaque genotype individuel
-grep -v consensus $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/tmp_poly
+grep -E 'Catalog|/' $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/tmp_poly
 datamash transpose < $OUT_DIR/tmp_poly > $OUT_DIR/tmp_poly_transposed
-rm $OUT_DIR/tmp_poly
 python $SCRIPT_DIR/add_cov_to_tab.py -i $OUT_DIR/tmp_poly_transposed -d $OUT_DIR/input -o $OUT_DIR/tmp_poly_cov_transposed
 if [[ $? == 0 ]]
 then
-        rm $OUT_DIR/tmp_poly_transposed
+        rm $OUT_DIR/tmp_poly $OUT_DIR/tmp_poly_transposed
         datamash transpose < $OUT_DIR/tmp_poly_cov_transposed > $OUT_DIR/locus_polymorphes_cov.txt
         rm $OUT_DIR/tmp_poly_cov_transposed
         POLY=$OUT_DIR/locus_polymorphes_cov.txt
 else
         rm $OUT_DIR/tmp_poly_transposed $OUT_DIR/tmp_poly_cov_transposed
-        grep -v consensus $OUT_DIR/batch_1.haplotypes_amb_ord.tsv > $OUT_DIR/locus_polymorphes.txt
+        mv $OUT_DIR/tmp_poly $OUT_DIR/locus_polymorphes.txt
         POLY=$OUT_DIR/locus_polymorphes.txt
 fi
 

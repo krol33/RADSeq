@@ -462,7 +462,8 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
             cnt = line.split("\t").index("Cnt")
         else :
             # number of individuals genotyped
-            nb_indiv_clust.append(int(line.split()[cnt]))
+            nb_genotyped = int(line.split()[cnt])
+            nb_indiv_clust.append(nb_genotyped)
 
             # update summary with number of (polymorphic) cluster genotyped (for at least 50% of individuals)
             haplotype_stat["summary"]["values"][0] += 1
@@ -477,7 +478,6 @@ def parse_haplotype(res_dir, pop_map,haplotype_stat):
             # parse haplotype
             haplotypes = line.strip().split("\t")[start:]
             alleles = list()
-            nb_genotyped = int(line.strip().split()[1])
             for idx,hap in enumerate(haplotypes):
                 sample = samples[idx]
                 # count unknown haplotype per sample
