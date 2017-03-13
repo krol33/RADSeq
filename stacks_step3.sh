@@ -43,6 +43,11 @@ mkdir -p $SGE $SSTACKS_DIR $STAT_DIR
 
 ###########################################################################################
 
+if [[ -e $SGE/sstacks.qarray ]]
+then
+rm $SGE/sstacks.qarray
+fi
+
 if [[ $align == 1 ]]
 then 
 OPT=`echo $OPT" -g"`
