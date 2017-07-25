@@ -7,7 +7,7 @@
 #$ -S /bin/sh
 
 #$ -q unlimitq
-
+#$ -pe parallel_smp 10
 #$ -m bea
 
 date
@@ -38,9 +38,9 @@ MAX_PRIM_DIST=2
 MAX_SEC_DIST=4
 # --max_locus_stacks option pour individus diploïde. (Pour les individus happloïdes doublés cette option sera à 2)
 MAC_LOCUS_STACKS=3
-# autres options telles que :  --model_type --alpha --bound_low --bound_high --bc_err_freq. Ecrire la chaine de caractère entre "quotte"
-STACKS_OPT=""
-
+# autres options stacks telles que :  --model_type (ustacks) --vcf (populations) .... Ecrire la chaine de caractère entre simple 'quotte', sous la forme -X "stacks_prog:options"
+# exemple '-X "ustacks:--model_type snp" -X "populations:--vcf" '
+STACKS_OPT=''
 #cstacks
 MISMATCH=1
 
@@ -72,6 +72,12 @@ if [[ $MAC_LOCUS_STACKS != "" ]]
 then
   cmd_line=$cmd_line" -X \"ustacks:--max_locus_stacks $MAC_LOCUS_STACKS\""
 fi
+
+if [[ $STACKS_OPT != "" ]]
+then
+  cmd_line=$cmd_line" "$STACKS_OPT
+fi
+
 echo $cmd_line  > $SGE/denovo_map.sh
 
 echo "DENOVO_MAP"
